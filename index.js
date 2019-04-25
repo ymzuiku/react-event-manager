@@ -58,7 +58,7 @@ class Event extends React.PureComponent {
     this.unMount = true;
   }
 
-  handleOnEvent = (e, eventArgs, eventHandle) => {
+  handleOnEvent = (e, eventArgs, eventName) => {
     const { onEvent, handle, children, formRefs, formValues } = this.props;
 
     let value = e;
@@ -90,12 +90,12 @@ class Event extends React.PureComponent {
         handle,
         eventArgs,
         update: this.update,
-        eventHandle,
+        eventName,
       });
 
       // 如果子注册了相应的事件函数, 也同事响应它, 并且传递其他状态数据
-      if (children.props && typeof children.props[eventHandle] === 'function') {
-        children.props[eventHandle](e, {
+      if (children.props && typeof children.props[eventName] === 'function') {
+        children.props[eventName](e, {
           ref: this.ref,
           value,
           eventArgs,
@@ -103,7 +103,7 @@ class Event extends React.PureComponent {
           update: this.update,
           refs: formRefs,
           values: formValues,
-          eventHandle,
+          eventName,
         });
       }
     }
@@ -184,7 +184,7 @@ export default class extends React.PureComponent {
     this.handleOnEvent({ ...params, isFromDidMount: true });
   };
 
-  handleOnEvent = ({ ref, value, handle, update, eventHandle, eventArgs, isFromDidMount }) => {
+  handleOnEvent = ({ ref, value, handle, update, eventName, eventArgs, isFromDidMount }) => {
     const { datas, onEvent } = this.props;
 
     this.formValues[handle] = value;
@@ -198,7 +198,7 @@ export default class extends React.PureComponent {
       eventArgs,
       refs: this.formRefs,
       updates: this.formUpdates,
-      eventHandle,
+      eventName,
     };
 
     if (datas) {
