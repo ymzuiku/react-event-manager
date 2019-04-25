@@ -1,5 +1,25 @@
 # 内聚的事件管理器
 
+## 下载 & 使用
+
+懒得编译发布了, 进入项目
+
+```sh
+cd your-project/components
+```
+
+执行以下命令, 将会只保留组件代码
+
+```sh
+git clone --depth=1 https://github.com/ymzuiku/react-event-manager.git && rm -rf react-event-manager/.git react-event-manager/.gitignore
+```
+
+直接引用
+
+```js
+import Manager from "components/react-event-manager";
+```
+
 ## API
 
 ### Manager API
@@ -32,10 +52,6 @@
 | eventName | any                  | 触发 onEvent 的类型, 默认情况下为 onEvent                      |
 | eventArgs | Array<any>           | 触发 onEvent 的类型的默认参数                                  |
 
-```js
-import Manager from 'react-event-manager';
-```
-
 ## 基本使用方式
 
 ```js
@@ -44,7 +60,7 @@ import Manager from 'react-event-manager';
   {Event => (
     <div>
       <div>我是标题</div>
-      <Event defaultValue={'hello'} name="username">
+      <Event defaultValue={"hello"} name="username">
         <input />
       </Event>
       <Event name="password">
@@ -91,7 +107,7 @@ import Manager from 'react-event-manager';
   {(Event, onTrigger) => (
     <div>
       <div>我是标题</div>
-      <Event defaultValue={'hello'} name="username">
+      <Event defaultValue={"hello"} name="username">
         <input />
       </Event>
       <Event name="password">
@@ -109,7 +125,7 @@ import Manager from 'react-event-manager';
 // refs 中包含所有 Event 子组件的ref, 根据条件执行事件即可
 <Manager
   onEvent={({ value, refs }) => {
-    if (value === '...') {
+    if (value === "...") {
       refs.button.save();
     }
   }}
@@ -137,7 +153,7 @@ const datas = {};
   {Event => (
     <div>
       <div>我是标题</div>
-      <Event defaultValue={'hello'} name="username">
+      <Event defaultValue={"hello"} name="username">
         <input />
       </Event>
       <Event name="password">
