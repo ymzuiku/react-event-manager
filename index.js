@@ -110,8 +110,8 @@ class Event extends React.PureComponent {
   };
 
   render() {
-    const { value, valuekey, otherProps } = this.state;
-    const { children } = this.props;
+    const { value, otherProps } = this.state;
+    const { children, valuekey } = this.props;
 
     // 根据 children 类型执行不同的渲染方式, 只支持 fn children 和单 children
     if (typeof children === 'function') {
