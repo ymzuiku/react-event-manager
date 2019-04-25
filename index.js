@@ -56,6 +56,9 @@ class Event extends React.PureComponent {
 
     // 如果是DOM对象, 根据类型取值
     if (typeof e === 'object') {
+      if (typeof e.preventDefault === 'function') {
+        e.preventDefault();
+      }
       if (e.target) {
         if (e.target.files) {
           value = e.target.file[0];
@@ -238,8 +241,11 @@ export default class extends React.PureComponent {
   };
 
   render() {
-    const { children } = this.props;
+    const { children, onSubmit } = this.props;
 
+    if (onSubmit) {
+      return <form>{this.regChild({ children })}</form>;
+    }
     return this.regChild({ children });
   }
 }
