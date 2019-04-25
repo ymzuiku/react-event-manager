@@ -19,9 +19,7 @@ class Event extends React.PureComponent {
     };
 
     this.unMount = false;
-    this.ref =
-      (this.props.children.props && this.props.children.props.innerRef) ||
-      React.createRef();
+    this.ref = (this.props.children.props && this.props.children.props.innerRef) || React.createRef();
     const events = this.props.events.split(',').map(v => v.trim());
 
     this.onEvents = {};
@@ -174,15 +172,7 @@ export default class extends React.PureComponent {
     this.handleOnEvent({ ...params, isFromDidMount: true });
   };
 
-  handleOnEvent = ({
-    ref,
-    value,
-    handle,
-    update,
-    eventHandle,
-    eventArgs,
-    isFromDidMount,
-  }) => {
+  handleOnEvent = ({ ref, value, handle, update, eventHandle, eventArgs, isFromDidMount }) => {
     const { datas, onEvent } = this.props;
 
     this.formValues[handle] = value;
