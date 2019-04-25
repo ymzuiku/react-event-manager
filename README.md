@@ -29,6 +29,8 @@ import Manager from "components/react-event-manager";
 | datas       | Object             | Manager 的数据集合, 具体内容参考 datas API                                    |
 | onEvent     | Function           | 当 Event 的事件触发时, 会进行回调                                             |
 | onTrigger   | Function           | 当 Event 的 onTrigger 事件触发时, 会进行回调                                  |
+| onDidMount  | Function           | 当 Manager DidMount, 会进行回调                                               |
+| onUnMount   | Function           | Manager UnMount, 会进行回调                                                   |
 | renderProps | [Event, onTrigger] | Event 是用于处理输入组件的组件, onTrigger 是用于触发 Manager.onTirgger 的函数 |
 
 ### Event API

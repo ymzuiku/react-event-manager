@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
 interface IDatas {
   /** 触发事件的 Event.name  */
@@ -35,6 +35,10 @@ interface IProps {
   onEvent: (datas: IDatas) => void;
   /** 当 Event 的 onTrigger 事件触发时, 会进行回调 */
   onTrigger: (datas: IDatas) => void;
+  /** 当 Manager DidMount, 会进行回调 */
+  onDidMount: (datas: IDatas) => void;
+  /** 当 Manager UnMount, 会进行回调 */
+  onUnMount: (datas: IDatas) => void;
   /** Event 是用于处理输入组件的组件, onTrigger 是用于触发 Manager.onTirgger 的函数 */
   children: (Event: IEventProps, onTrigger: Function) => React.ReactElement;
 }
