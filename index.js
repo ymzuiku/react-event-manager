@@ -6,7 +6,7 @@ class Event extends React.PureComponent {
   static defaultProps = {
     // 用于配置其他触发onChange的键
     events: 'onChange, onClick, onTouchEnd',
-    valuekey: 'value'
+    valuekey: 'value',
   };
 
   constructor(props) {
@@ -15,7 +15,7 @@ class Event extends React.PureComponent {
     this.state = {
       value: this.props.defvalue || '',
       // 用于update时, 更新其他props
-      otherProps: {}
+      otherProps: {},
     };
 
     this.unMount = false;
@@ -42,7 +42,7 @@ class Event extends React.PureComponent {
         ref: this.ref,
         value: this.state.value,
         handle,
-        update: this.update
+        update: this.update,
       });
     }
   }
@@ -80,7 +80,7 @@ class Event extends React.PureComponent {
         handle,
         eventArgs,
         update: this.update,
-        eventHandle
+        eventHandle,
       });
 
       // 如果子注册了相应的事件函数, 也同事响应它, 并且传递其他状态数据
@@ -93,7 +93,7 @@ class Event extends React.PureComponent {
           update: this.update,
           refs: formRefs,
           values: formValues,
-          eventHandle
+          eventHandle,
         });
       }
     }
@@ -106,7 +106,7 @@ class Event extends React.PureComponent {
     this.setState(({ value: lastValue }) => {
       return {
         value: value || lastValue,
-        otherProps
+        otherProps,
       };
     });
   };
@@ -121,7 +121,7 @@ class Event extends React.PureComponent {
         ...otherProps,
         ...this.onEvents,
         [valuekey]: value,
-        ref: this.ref
+        ref: this.ref,
       });
     }
 
@@ -130,7 +130,7 @@ class Event extends React.PureComponent {
       ...otherProps,
       ...this.onEvents,
       [valuekey]: value,
-      ref: this.ref
+      ref: this.ref,
     });
   }
 }
@@ -138,7 +138,7 @@ class Event extends React.PureComponent {
 // eslint-disable-next-line
 export default class extends React.PureComponent {
   static defaultProps = {
-    group: 'handle'
+    group: 'handle',
   };
 
   formValues = {};
@@ -181,7 +181,7 @@ export default class extends React.PureComponent {
     update,
     eventHandle,
     eventArgs,
-    isFromDidMount
+    isFromDidMount,
   }) => {
     const { datas, onEvent } = this.props;
 
@@ -196,7 +196,7 @@ export default class extends React.PureComponent {
       eventArgs,
       refs: this.formRefs,
       updates: this.formUpdates,
-      eventHandle
+      eventHandle,
     };
 
     if (datas) {
@@ -220,7 +220,7 @@ export default class extends React.PureComponent {
 
       if (child.props.children && typeof child.props.children !== 'function') {
         child = React.cloneElement(child, {
-          children: this.regChild({ children: child.props.children })
+          children: this.regChild({ children: child.props.children }),
         });
       }
 
