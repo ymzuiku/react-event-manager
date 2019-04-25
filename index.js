@@ -5,7 +5,7 @@ import React from 'react';
 class Event extends React.PureComponent {
   static defaultProps = {
     // 用于配置其他触发onChange的键
-    events: 'onChange, onClick, onTouchEnd',
+    events: 'onChange, onClick, onTouchEnd, onSubmit',
     valuekey: 'value',
   };
 
@@ -20,7 +20,16 @@ class Event extends React.PureComponent {
 
     this.unMount = false;
     this.ref = (this.props.children.props && this.props.children.props.innerRef) || React.createRef();
-    const events = this.props.events.split(',').map(v => v.trim());
+
+    // 如果使用默认的属性进行拼接, 需要包含 ...
+
+    const eventsString =
+      this.props.events.indexOf('...') >= 0 ? this.props.events.replace('...', Event.defaultProps.events) : this.props.events;
+
+    const events = eventsString
+      .split(',')
+      .map(v => v.trim())
+      .filter(Boolean);
 
     this.onEvents = {};
 
@@ -241,11 +250,8 @@ export default class extends React.PureComponent {
   };
 
   render() {
-    const { children, onSubmit } = this.props;
+    const { children } = this.props;
 
-    if (onSubmit) {
-      return <form>{this.regChild({ children })}</form>;
-    }
     return this.regChild({ children });
   }
 }
