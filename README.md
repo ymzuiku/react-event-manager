@@ -20,7 +20,7 @@ clone-by-ymzuiku react-event-manager
 直接引用
 
 ```js
-import Manager from "components/react-event-manager";
+import Manager from 'components/react-event-manager';
 ```
 
 ## API
@@ -30,10 +30,10 @@ import Manager from "components/react-event-manager";
 | key         | 类型               | 说明                                                                          |
 | ----------- | ------------------ | ----------------------------------------------------------------------------- |
 | datas       | Object             | Manager 的数据集合, 具体内容参考 datas API                                    |
-| onEvent     | Function           | 当 Event 的事件触发时, 会进行回调                                             |
-| onTrigger   | Function           | 当 Event 的 onTrigger 事件触发时, 会进行回调                                  |
-| onDidMount  | Function           | 当 Manager DidMount, 会进行回调                                               |
-| onUnMount   | Function           | Manager UnMount, 会进行回调                                                   |
+| onEvent     | Function           | 当 Event 的事件触发时, 进行回调                                               |
+| onTrigger   | Function           | 当 Event 的 onTrigger 事件触发时, 进行回调                                    |
+| onDidMount  | Function           | 当 Manager DidMount 时, 进行回调                                              |
+| onUnMount   | Function           | 当 Manager UnMount 时, 进行回调                                               |
 | renderProps | [Event, onTrigger] | Event 是用于处理输入组件的组件, onTrigger 是用于触发 Manager.onTirgger 的函数 |
 
 ### Event API
@@ -65,7 +65,7 @@ import Manager from "components/react-event-manager";
   {Event => (
     <div>
       <div>我是标题</div>
-      <Event defaultValue={"hello"} name="username">
+      <Event defaultValue={'hello'} name="username">
         <input />
       </Event>
       <Event name="password">
@@ -79,7 +79,7 @@ import Manager from "components/react-event-manager";
 ## 联动
 
 ```js
-// 所有值, ref, update事件, 联动对象, 都在 params 中
+// 所有值, ref, update事件, 联动对象, 都在 事件的返回值中
 <Manager onEvent={({values, updates, name})=> {
   // 如果username包含 404, 就更新 password
   if (values.username.index('404') >= 0) {
@@ -112,7 +112,7 @@ import Manager from "components/react-event-manager";
   {(Event, onTrigger) => (
     <div>
       <div>我是标题</div>
-      <Event defaultValue={"hello"} name="username">
+      <Event defaultValue={'hello'} name="username">
         <input />
       </Event>
       <Event name="password">
@@ -130,7 +130,7 @@ import Manager from "components/react-event-manager";
 // refs 中包含所有 Event 子组件的ref, 根据条件执行事件即可
 <Manager
   onEvent={({ value, refs }) => {
-    if (value === "...") {
+    if (value === '...') {
       refs.button.save();
     }
   }}
@@ -158,7 +158,7 @@ const datas = {};
   {Event => (
     <div>
       <div>我是标题</div>
-      <Event defaultValue={"hello"} name="username">
+      <Event defaultValue={'hello'} name="username">
         <input />
       </Event>
       <Event name="password">
@@ -172,8 +172,7 @@ const datas = {};
 ## 异步设定初始值
 
 ```js
-// 所有值, ref, update 事件, 联动对象, 都在 params 中
-<Manager onDidMount={({updates})=> {
+<Manager onDidMount={({ updates })=> {
   // 异步请求, 根据返回内容更新界面
   fetch(....).then(res=>res.json()).then(data=>{
     updates.username({value: data.username})
