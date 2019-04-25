@@ -8,10 +8,13 @@
 cd your-project/components
 ```
 
-执行以下命令, 将会只保留组件代码
+拷贝并执行以下命令, 将会只克隆组件代码
 
 ```sh
-git clone --depth=1 https://github.com/ymzuiku/react-event-manager.git && rm -rf react-event-manager/.git react-event-manager/.gitignore
+clone-by-ymzuiku(){
+  git clone --depth=1 https://github.com/ymzuiku/$1.git && rm -rf $1/.git $1/.gitignore
+}
+clone-by-ymzuiku react-event-manager
 ```
 
 直接引用
