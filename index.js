@@ -5,42 +5,42 @@ import React from 'react';
 class Event extends React.PureComponent {
   static defaultProps = {
     // 用于配置其他触发onChange的键
-    keys: ['value', 'onChange', 'onClick', 'onTouchEnd']
+    events: 'onChange, onClick, onTouchEnd',
+    valuekey: 'value',
   };
 
   constructor(props) {
     super(props);
 
     this.state = {
-      value: this.props.defaultValue || '',
+      value: this.props.defvalue || '',
       // 用于update时, 更新其他props
-      otherProps: {}
+      otherProps: {},
     };
 
     this.unMount = false;
-    this.ref =
-      (this.props.children.props && this.props.children.props.innerRef) ||
-      React.createRef();
+    this.ref = (this.props.children.props && this.props.children.props.innerRef) || React.createRef();
+    const events = this.props.events.split(',').map(v => v.trim());
+
     this.onEvents = {};
-    this.props.keys.forEach((k, i) => {
-      if (i !== 0) {
-        this.onEvents[k] = (value, ...args) => {
-          this.handleOnEvent(value, [value, ...args], k);
-        };
-      }
+
+    events.forEach(k => {
+      this.onEvents[k] = (value, ...args) => {
+        this.handleOnEvent(value, [value, ...args], k);
+      };
     });
   }
 
   componentDidMount() {
-    const { onDidMount, name } = this.props;
+    const { onDidMount, handle } = this.props;
 
     if (typeof onDidMount === 'function') {
       // 用于在渲染后,就获得refs对象结构
       onDidMount({
         ref: this.ref,
         value: this.state.value,
-        name,
-        update: this.update
+        handle,
+        update: this.update,
       });
     }
   }
@@ -49,8 +49,8 @@ class Event extends React.PureComponent {
     this.unMount = true;
   }
 
-  handleOnEvent = (e, eventArgs, eventName) => {
-    const { onEvent, name, children, formRefs, formValues } = this.props;
+  handleOnEvent = (e, eventArgs, eventHandle) => {
+    const { onEvent, handle, children, formRefs, formValues } = this.props;
 
     let value = e;
 
@@ -75,23 +75,23 @@ class Event extends React.PureComponent {
       onEvent({
         ref: this.ref,
         value,
-        name,
+        handle,
         eventArgs,
         update: this.update,
-        eventName
+        eventHandle,
       });
 
       // 如果子注册了相应的事件函数, 也同事响应它, 并且传递其他状态数据
-      if (children.props && typeof children.props[eventName] === 'function') {
-        children.props[eventName](e, {
+      if (children.props && typeof children.props[eventHandle] === 'function') {
+        children.props[eventHandle](e, {
           ref: this.ref,
           value,
           eventArgs,
-          name,
+          handle,
           update: this.update,
           refs: formRefs,
           values: formValues,
-          eventName
+          eventHandle,
         });
       }
     }
@@ -104,22 +104,22 @@ class Event extends React.PureComponent {
     this.setState(({ value: lastValue }) => {
       return {
         value: value || lastValue,
-        otherProps
+        otherProps,
       };
     });
   };
 
   render() {
-    const { value, otherProps } = this.state;
-    const { children, keys } = this.props;
+    const { value, valuekey, otherProps } = this.state;
+    const { children } = this.props;
 
     // 根据 children 类型执行不同的渲染方式, 只支持 fn children 和单 children
     if (typeof children === 'function') {
       return children({
         ...otherProps,
         ...this.onEvents,
-        [keys[0]]: value,
-        ref: this.ref
+        [valuekey]: value,
+        ref: this.ref,
       });
     }
 
@@ -127,14 +127,18 @@ class Event extends React.PureComponent {
       ...children.props,
       ...otherProps,
       ...this.onEvents,
-      [keys[0]]: value,
-      ref: this.ref
+      [valuekey]: value,
+      ref: this.ref,
     });
   }
 }
 
 // eslint-disable-next-line
 export default class extends React.PureComponent {
+  static defaultProps = {
+    group: 'handle',
+  };
+
   formValues = {};
 
   formRefs = {};
@@ -164,41 +168,25 @@ export default class extends React.PureComponent {
     }
   }
 
-  handleOnTrigger = value => {
-    const { onTrigger } = this.props;
-
-    if (typeof onTrigger === 'function') {
-      onTrigger(value, this.formDatas);
-    }
-  };
-
   handleOnDidMound = params => {
     this.handleOnEvent({ ...params, isFromDidMount: true });
   };
 
-  handleOnEvent = ({
-    ref,
-    value,
-    name,
-    update,
-    eventName,
-    eventArgs,
-    isFromDidMount
-  }) => {
+  handleOnEvent = ({ ref, value, handle, update, eventHandle, eventArgs, isFromDidMount }) => {
     const { datas, onEvent } = this.props;
 
-    this.formValues[name] = value;
-    this.formRefs[name] = ref;
-    this.formUpdates[name] = update;
+    this.formValues[handle] = value;
+    this.formRefs[handle] = ref;
+    this.formUpdates[handle] = update;
     this.formDatas = {
       ref,
       value,
-      name,
+      handle,
       values: this.formValues,
       eventArgs,
       refs: this.formRefs,
       updates: this.formUpdates,
-      eventName
+      eventHandle,
     };
 
     if (datas) {
@@ -212,21 +200,51 @@ export default class extends React.PureComponent {
     }
   };
 
-  event = props => {
-    return (
-      <Event
-        {...props}
-        onDidMount={this.handleOnDidMound}
-        onEvent={this.handleOnEvent}
-        formValues={this.formValues}
-        formTargets={this.formRefs}
-      />
-    );
+  regChild = ({ children, test }) => {
+    const { group } = this.props;
+
+    if (test === 'xx') {
+      console.log('xx1', children);
+    }
+
+    return React.Children.map(children, child => {
+      if (test === 'xx') {
+        console.log('xx', child);
+      }
+      if (!child || !child.props) {
+        return child;
+      }
+
+      if (child.props.children && typeof child.props.children !== 'function') {
+        child = React.cloneElement(child, { children: this.regChild({ children: child.props.children }) });
+      }
+
+      if (child.props.SubManager) {
+        child = React.cloneElement(child, { SubManager: this.regChild });
+      }
+
+      if (child.props[group]) {
+        return (
+          <Event
+            defvalue={child.props.defvalue}
+            events={child.props.events}
+            handle={child.props[group]}
+            onDidMount={this.handleOnDidMound}
+            onEvent={this.handleOnEvent}
+            formValues={this.formValues}
+            formTargets={this.formRefs}
+          >
+            {child}
+          </Event>
+        );
+      }
+      return child;
+    });
   };
 
   render() {
     const { children } = this.props;
 
-    return children(this.event, this.handleOnTrigger);
+    return this.regChild({ children });
   }
 }

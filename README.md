@@ -34,47 +34,103 @@ import Manager from 'components/react-event-manager';
 | onTrigger   | Function           | 当 Event 的 onTrigger 事件触发时, 进行回调                                    |
 | onDidMount  | Function           | 当 Manager DidMount 时, 进行回调                                              |
 | onUnMount   | Function           | 当 Manager UnMount 时, 进行回调                                               |
-| renderProps | [Event, onTrigger] | Event 是用于处理输入组件的组件, onTrigger 是用于触发 Manager.onTirgger 的函数 |
+| group | String | 默认为 'handle', 如果多个Manger嵌套, 希望父集捕获子集时, 可以修改group, 然后在子集注入多个 handle |
 
-### Event API
+### Handle API
+
+我们可以为一个组件注入以下props, Manger会递归子组件, 根据这些props注入相应的
 
 | key          | 类型          | 说明                                                                                                         |
-| ------------ | ------------- | ------------------------------------------------------------------------------------------------------------ |
-| keys         | Array<String> | 该 Event 会触发的值和事件, 默认为 ['value', 'onChange', 'onClick', 'onTouchEnd'], 其中第一个为值, 其他为对象 |
-| name         | String        | 请确保同一个 Manager 下 所有 Event 的 name 是唯一的, Manager 的数据集合                                      |
-| defaultValue | Any           | 默认设置给 value 的值                                                                                        |
+| ------------ | ------------- | ------------------------------------------------ |
+| handle         | String        | handle 请确保同一个 Manager 下 所有 handle 是唯一的, Manager 的数据集合                                      |
+| valuekey         | String | 该 Event 会触发的值, 默认为 'value' |
+| events         | String | 该 Event 会触发的值和事件, 默认为 'onChange, onClick, onTouchEnd' |
+| defvalue | any           | 默认设置给 value 的值                                                                                        |
+| SubManager | Boolean | SubManager 标记为 true, 会被注入 SubManager 组件, 用于跨组件捕获事件至父 Manager |
 
 ### datas API
 
 | key       | 类型                 | 说明                                                           |
 | --------- | -------------------- | -------------------------------------------------------------- |
-| name      | String               | 触发事件的 Event.name                                          |
+| handle      | String               | 触发事件的 handle 名称                                          |
 | value     | Any                  | onEvent 返回的值, 如果是 DOM 对象返回的是 event.target.value   |
-| values    | {[name]:value, ...}  | 由 name 和 value 组合而成的对象                                |
+| values    | {[handle]:value, ...}  | 由 handle 名和 value 组合而成的对象                                |
 | ref       | React.element        | 当前触发的 React 对象                                          |
 | refs      | Array<React.element> | 所有被 <Event /> 包裹的 React 对象的集合                       |
-| updates   | {[name]:update}      | 每个 Event 更新子组件的函数集合, 参数会作为 Props 传递给子组件 |
-| eventName | any                  | 触发 onEvent 的类型, 默认情况下为 onEvent                      |
+| updates   | {[handle]:update}      | 每个 Event 更新子组件的函数集合, 参数会作为 Props 传递给子组件 |
+| eventHandle | any                  | 触发 onEvent 的类型, 如 onChange, onClick                      |
 | eventArgs | Array<any>           | 触发 onEvent 的类型的默认参数                                  |
 
 ## 基本使用方式
 
+Manger本身不包含DOM, 所以需要将他放在一个标签内, 如 div 内:
+
+```js
+export default ()=> {
+  return (
+    <div>
+      <Manager>
+        <input />
+        <button />
+      </Manager>
+    <div>
+  )
+}
+```
+
+接下来的例子, 我们默认 Manager 在一个 div 内
+
+## 捕获事件
+
+Manager 内的组件添加一个 handle 属性, Manager 即可捕获其的事件, 默认捕获 `onChange, onClick, onTouchEnd`
+
 ```js
 // 所有值, ref, update事件, 联动对象, 都在 datas 中
 <Manager onEvent={datas => console.log(datas)}>
-  {Event => (
-    <div>
-      <div>我是标题</div>
-      <Event defaultValue={'hello'} name="username">
-        <input />
-      </Event>
-      <Event name="password">
-        <input />
-      </Event>
-    </div>
-  )}
+  <input defvalue="hello" handle="username />
+  <div>
+    <div>多层级内的 handle 一样可以捕获</div>
+    <input handle="password" />
+  </div>
 </Manager>
 ```
+
+## 触发其他事件
+
+主动触发非常简单, 主动设置 events 类型如: `onClick, onMouseLeave`
+
+```js
+<Manager onTrigget={(event, datas) => console.log(event, datas)}>
+  <input defvalue="hello" handle="username />
+  <input handle="password" />
+  <button events="onClick, onMouseLeave" handle="theButton" />
+</Manager>
+```
+
+## 跨组件捕获
+
+1. 声明一个组件为 SubManager
+
+```js
+<Manager onTrigget={(event, datas) => console.log(event, datas)}>
+  <HeaderBar SubManager></HeaderBar>
+</Manager>
+```
+
+2. 该组件会被注入一个 SubManager 组件, SubManager 将捕获的事件返回到父 Manager
+
+```js
+function HeaderBar({SubManager}){
+  return (
+    <SubManager>
+      <div>
+        <input handle="search" />
+      </div>
+    </SubManager>
+  )
+}
+```
+
 
 ## 联动
 
@@ -89,38 +145,8 @@ import Manager from 'components/react-event-manager';
     })
   }
 }}>
-  {Event=>(
-    <div>
-      <div>我是标题</div>
-      <Event defaultValue={"hello"} name="username">
-        <input />
-      </Event>
-      <Event name="password">
-        <input />
-      </Event>
-    </div>
-  )}
-</Manager>
-```
-
-## 主动触发
-
-主动触发非常简单, 将 renderProps 中 onTrigger 函数设置为触发事件即可
-
-```js
-<Manager onTrigget={(event, datas) => console.log(event, datas)}>
-  {(Event, onTrigger) => (
-    <div>
-      <div>我是标题</div>
-      <Event defaultValue={'hello'} name="username">
-        <input />
-      </Event>
-      <Event name="password">
-        <input />
-      </Event>
-      <button onClick={onTrigger}>提交</button>
-    </div>
-  )}
+  <input defvalue="hello" handle="username />
+  <input handle="password" />
 </Manager>
 ```
 
@@ -135,14 +161,8 @@ import Manager from 'components/react-event-manager';
     }
   }}
 >
-  {Event => (
-    <div>
-      <div>我是标题</div>
-      <Event name="button">
-        <Button />
-      </Event>
-    </div>
-  )}
+  <div>我是标题</div>
+  <Button handle="button" />
 </Manager>
 ```
 
@@ -155,17 +175,7 @@ const datas = {};
 
 // ManagerDatas 将会存储在 datas 对象中
 <Manager datas={datas}>
-  {Event => (
-    <div>
-      <div>我是标题</div>
-      <Event defaultValue={'hello'} name="username">
-        <input />
-      </Event>
-      <Event name="password">
-        <input />
-      </Event>
-    </div>
-  )}
+  <input defvalue="hello" handle="username />
 </Manager>;
 ```
 
@@ -176,19 +186,8 @@ const datas = {};
   // 异步请求, 根据返回内容更新界面
   fetch(....).then(res=>res.json()).then(data=>{
     updates.username({value: data.username})
-    updates.vip({title: data.vip})
   })
 }}>
-  {Event=>(
-    <div>
-      <div>我是标题</div>
-      <Event defaultValue={"hello"} name="username">
-        <input />
-      </Event>
-      <Event name="vip">
-        <Title />
-      </Event>
-    </div>
-  )}
+  <input handle="username />
 </Manager>
 ```
