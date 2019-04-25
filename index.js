@@ -6,7 +6,7 @@ class Event extends React.PureComponent {
   static defaultProps = {
     // 用于配置其他触发onChange的键
     events: 'onChange, onClick, onTouchEnd',
-    valuekey: 'value',
+    valuekey: 'value'
   };
 
   constructor(props) {
@@ -15,11 +15,13 @@ class Event extends React.PureComponent {
     this.state = {
       value: this.props.defvalue || '',
       // 用于update时, 更新其他props
-      otherProps: {},
+      otherProps: {}
     };
 
     this.unMount = false;
-    this.ref = (this.props.children.props && this.props.children.props.innerRef) || React.createRef();
+    this.ref =
+      (this.props.children.props && this.props.children.props.innerRef) ||
+      React.createRef();
     const events = this.props.events.split(',').map(v => v.trim());
 
     this.onEvents = {};
@@ -40,7 +42,7 @@ class Event extends React.PureComponent {
         ref: this.ref,
         value: this.state.value,
         handle,
-        update: this.update,
+        update: this.update
       });
     }
   }
@@ -78,7 +80,7 @@ class Event extends React.PureComponent {
         handle,
         eventArgs,
         update: this.update,
-        eventHandle,
+        eventHandle
       });
 
       // 如果子注册了相应的事件函数, 也同事响应它, 并且传递其他状态数据
@@ -91,7 +93,7 @@ class Event extends React.PureComponent {
           update: this.update,
           refs: formRefs,
           values: formValues,
-          eventHandle,
+          eventHandle
         });
       }
     }
@@ -104,7 +106,7 @@ class Event extends React.PureComponent {
     this.setState(({ value: lastValue }) => {
       return {
         value: value || lastValue,
-        otherProps,
+        otherProps
       };
     });
   };
@@ -119,7 +121,7 @@ class Event extends React.PureComponent {
         ...otherProps,
         ...this.onEvents,
         [valuekey]: value,
-        ref: this.ref,
+        ref: this.ref
       });
     }
 
@@ -128,7 +130,7 @@ class Event extends React.PureComponent {
       ...otherProps,
       ...this.onEvents,
       [valuekey]: value,
-      ref: this.ref,
+      ref: this.ref
     });
   }
 }
@@ -136,7 +138,7 @@ class Event extends React.PureComponent {
 // eslint-disable-next-line
 export default class extends React.PureComponent {
   static defaultProps = {
-    group: 'handle',
+    group: 'handle'
   };
 
   formValues = {};
@@ -172,7 +174,15 @@ export default class extends React.PureComponent {
     this.handleOnEvent({ ...params, isFromDidMount: true });
   };
 
-  handleOnEvent = ({ ref, value, handle, update, eventHandle, eventArgs, isFromDidMount }) => {
+  handleOnEvent = ({
+    ref,
+    value,
+    handle,
+    update,
+    eventHandle,
+    eventArgs,
+    isFromDidMount
+  }) => {
     const { datas, onEvent } = this.props;
 
     this.formValues[handle] = value;
@@ -186,7 +196,7 @@ export default class extends React.PureComponent {
       eventArgs,
       refs: this.formRefs,
       updates: this.formUpdates,
-      eventHandle,
+      eventHandle
     };
 
     if (datas) {
@@ -200,23 +210,18 @@ export default class extends React.PureComponent {
     }
   };
 
-  regChild = ({ children, test }) => {
+  regChild = ({ children }) => {
     const { group } = this.props;
 
-    if (test === 'xx') {
-      console.log('xx1', children);
-    }
-
     return React.Children.map(children, child => {
-      if (test === 'xx') {
-        console.log('xx', child);
-      }
       if (!child || !child.props) {
         return child;
       }
 
       if (child.props.children && typeof child.props.children !== 'function') {
-        child = React.cloneElement(child, { children: this.regChild({ children: child.props.children }) });
+        child = React.cloneElement(child, {
+          children: this.regChild({ children: child.props.children })
+        });
       }
 
       if (child.props.SubManager) {
