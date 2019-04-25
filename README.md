@@ -174,6 +174,7 @@ const datas = {};
 ```js
 // 所有值, ref, update 事件, 联动对象, 都在 params 中
 <Manager onDidMount={({updates})=> {
+  // 异步请求, 根据返回内容更新界面
   fetch(....).then(res=>res.json()).then(data=>{
     updates.username({value: data.username})
     updates.vip({title: data.vip})
