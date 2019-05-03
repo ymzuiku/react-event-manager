@@ -27,43 +27,42 @@ import Manager from 'components/react-event-manager';
 
 ### Manager API
 
-| key        | 类型     | 说明                                                                                                 |
-| ---------- | -------- | ---------------------------------------------------------------------------------------------------- |
-| datas      | Object   | Manager 的数据集合, 具体内容参考 datas API                                                           |
-| onEvent    | Function | 当 Event 的事件触发时, 进行回调                                                                      |
-| onTrigger  | Function | 当 Event 的 onTrigger 事件触发时, 进行回调                                                           |
-| onDidMount | Function | 当 Manager DidMount 时, 进行回调                                                                     |
-| onUnMount  | Function | 当 Manager UnMount 时, 进行回调                                                                      |
-| group      | String   | 默认为 'handle', 如果多个 Manger 嵌套, 希望父集捕获子集时, 可以修改 group, 然后在子集注入多个 handle |
+| key         | 类型               | 说明                                                                          |
+| ----------- | ------------------ | ----------------------------------------------------------------------------- |
+| datas       | Object             | Manager 的数据集合, 具体内容参考 datas API                                    |
+| onEvent     | Function           | 当 Event 的事件触发时, 进行回调                                               |
+| onDidMount  | Function           | 当 Manager DidMount 时, 进行回调                                              |
+| onUnMount   | Function           | 当 Manager UnMount 时, 进行回调                                               |
+| group | String | 默认为 'handle', 如果多个Manger嵌套, 希望父集捕获子集时, 可以修改group, 然后在子集注入多个 handle |
 
 ### Handle API
 
-我们可以为一个组件注入以下 props, Manger 会递归子组件, 根据这些 props 注入相应的
+我们可以为一个组件注入以下props, Manger会递归子组件, 根据这些props注入相应的
 
-| key        | 类型    | 说明                                                                             |
-| ---------- | ------- | -------------------------------------------------------------------------------- |
-| handle     | String  | handle 请确保同一个 Manager 下 所有 handle 是唯一的, Manager 的数据集合          |
-| valuekey   | String  | 该 Event 会触发的值, 默认为 'value'                                              |
-| events     | String  | 该 Event 会触发的值和事件, 默认为 'onChange, onClick, onTouchEnd'                |
-| defvalue   | any     | 默认设置给 value 的值                                                            |
+| key          | 类型          | 说明                                                                                                         |
+| ------------ | ------------- | ------------------------------------------------ |
+| handle         | String        | handle 请确保同一个 Manager 下 所有 handle 是唯一的, Manager 的数据集合                                      |
+| valuekey         | String | 该 Event 会触发的值, 默认为 'value' |
+| events         | String | 该 Event 会触发的值和事件, 默认为 'onChange, onKeyEnter' |
+| defvalue | any           | 默认设置给 value 的值                                                                                        |
 | SubManager | Boolean | SubManager 标记为 true, 会被注入 SubManager 组件, 用于跨组件捕获事件至父 Manager |
 
 ### datas API
 
-| key       | 类型                  | 说明                                                           |
-| --------- | --------------------- | -------------------------------------------------------------- |
-| handle    | String                | 触发事件的 handle 名称                                         |
-| value     | Any                   | onEvent 返回的值, 如果是 DOM 对象返回的是 event.target.value   |
-| values    | {[handle]:value, ...} | 由 handle 名和 value 组合而成的对象                            |
-| ref       | React.element         | 当前触发的 React 对象                                          |
-| refs      | Array<React.element>  | 所有被 <Event /> 包裹的 React 对象的集合                       |
-| updates   | {[handle]:update}     | 每个 Event 更新子组件的函数集合, 参数会作为 Props 传递给子组件 |
-| eventName | any                   | 触发 onEvent 的类型, 如 onChange, onClick                      |
-| eventArgs | Array<any>            | 触发 onEvent 的类型的默认参数                                  |
+| key       | 类型                 | 说明                                                           |
+| --------- | -------------------- | -------------------------------------------------------------- |
+| handle      | String               | 触发事件的 handle 名称                                          |
+| value     | Any                  | onEvent 返回的值, 如果是 DOM 对象返回的是 event.target.value   |
+| values    | {[handle]:value, ...}  | 由 handle 名和 value 组合而成的对象                                |
+| ref       | React.element        | 当前触发的 React 对象                                          |
+| refs      | Array<React.element> | 所有被 <Event /> 包裹的 React 对象的集合                       |
+| updates   | {[handle]:update}      | 每个 Event 更新子组件的函数集合, 参数会作为 Props 传递给子组件 |
+| eventHandle | any                  | 触发 onEvent 的类型, 如 onChange, onClick                      |
+| eventArgs | Array<any>           | 触发 onEvent 的类型的默认参数                                  |
 
 ## 基本使用方式
 
-Manger 本身不包含 DOM, 所以需要将他放在一个标签内, 如 div 内:
+Manger本身不包含DOM, 所以需要将他放在一个标签内, 如 div 内:
 
 ```js
 export default ()=> {
@@ -82,7 +81,7 @@ export default ()=> {
 
 ## 捕获事件
 
-Manager 内的组件添加一个 handle 属性, Manager 即可捕获其的事件, 默认捕获 `onChange, onClick, onTouchEnd`
+Manager 内的组件添加一个 handle 属性, Manager 即可捕获其的事件, 默认捕获 `onChange, onKeyEnter`
 
 ```js
 // 所有值, ref, update事件, 联动对象, 都在 datas 中
@@ -100,7 +99,7 @@ Manager 内的组件添加一个 handle 属性, Manager 即可捕获其的事件
 主动触发非常简单, 主动设置 events 类型如: `onClick, onMouseLeave`
 
 ```js
-<Manager onTrigget={(event, datas) => console.log(event, datas)}>
+<Manager onEvent={(event, datas) => console.log(event, datas)}>
   <input defvalue="hello" handle="username />
   <input handle="password" />
   <button events="onClick, onMouseLeave" handle="theButton" />
@@ -112,24 +111,25 @@ Manager 内的组件添加一个 handle 属性, Manager 即可捕获其的事件
 1. 声明一个组件为 SubManager
 
 ```js
-<Manager onTrigget={(event, datas) => console.log(event, datas)}>
-  <HeaderBar SubManager />
+<Manager onEvent={(event, datas) => console.log(event, datas)}>
+  <HeaderBar SubManager></HeaderBar>
 </Manager>
 ```
 
 2. 该组件会被注入一个 SubManager 组件, SubManager 将捕获的事件返回到父 Manager
 
 ```js
-function HeaderBar({ SubManager }) {
+function HeaderBar({SubManager}){
   return (
     <SubManager>
       <div>
         <input handle="search" />
       </div>
     </SubManager>
-  );
+  )
 }
 ```
+
 
 ## 联动
 

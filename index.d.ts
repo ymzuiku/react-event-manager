@@ -14,7 +14,7 @@ interface IDatas {
   /** 每个 Event 更新子组件的函数集合, 参数会作为 Props 传递给子组件 */
   updates: Object;
   /** 触发 onEvent 的类型, 如 onChange, onClick */
-  eventName: String;
+  eventHandle: String;
   /** 触发 onEvent 的类型的默认参数 */
   eventArgs: Array<any>;
 }
