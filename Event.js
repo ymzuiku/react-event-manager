@@ -10,17 +10,23 @@ export default class Event extends React.PureComponent {
 
   lastValue = this.props.defvalue || '';
 
+  unMount = false;
+
   constructor(props) {
     super(props);
+
+    const { children } = props;
+
+    // 判断 children 是否属于纯函数组件, 只有纯函数才捆绑 ref
+    if (children.type && ((children.type.prototype && children.type.prototype.render) || children.type.render)) {
+      this.ref = (children.props && children.props.innerRef) || React.createRef();
+    }
 
     this.state = {
       value: this.props.defvalue || '',
       // 用于update时, 更新其他props
       otherProps: {},
     };
-
-    this.unMount = false;
-    this.ref = (this.props.children.props && this.props.children.props.innerRef) || React.createRef();
 
     // 如果使用默认的属性进行拼接, 需要包含 ...
 
@@ -41,9 +47,21 @@ export default class Event extends React.PureComponent {
       if (/onKey/.test(k)) {
         keyEvents.push((value, ...args) => {
           if (value && value.key) {
-            const key = k.replace('onKey', '');
+            const keys = k.replace('onKey', '').split('_');
 
-            if (key.toUpperCase() === value.key.toUpperCase()) {
+            let isModfileKeyDown = true;
+
+            keys.forEach((keyType, i) => {
+              if (i > 0) {
+                const modKey = keyType.toLowerCase() + 'Key';
+
+                if (value[modKey] !== true) {
+                  isModfileKeyDown = false;
+                }
+              }
+            });
+
+            if (isModfileKeyDown && keys[0].toUpperCase() === value.key.toUpperCase()) {
               this.handleOnEvent(this.lastValue, [this.lastValue, ...args], k);
             }
           }
@@ -88,12 +106,11 @@ export default class Event extends React.PureComponent {
     let v = e;
     let isAsync = true;
 
-    const updateValue = value => {
+    const updateValue = (value, isFile) => {
       // 更新value
-      if (value !== this.state.value) {
+      if (!isFile && value !== this.state.value) {
         this.setState({ value });
       }
-
       this.lastValue = value;
 
       if (typeof onEvent === 'function') {
@@ -146,7 +163,7 @@ export default class Event extends React.PureComponent {
 
           reader.readAsBinaryString(v);
           reader.onloadend = fileData => {
-            updateValue({ result: fileData.target.result, progress: fileData });
+            updateValue({ result: fileData.target.result, progress: fileData }, true);
           };
         } else {
           v = e.target.value;
@@ -175,22 +192,18 @@ export default class Event extends React.PureComponent {
     const { value, otherProps } = this.state;
     const { children, valuekey } = this.props;
 
-    // 根据 children 类型执行不同的渲染方式, 只支持 fn children 和单 children
-    if (typeof children === 'function') {
-      return children({
-        ...otherProps,
-        ...this.onEvents,
-        [valuekey]: value,
-        ref: this.ref,
-      });
-    }
-
-    return React.cloneElement(children, {
-      ...children.props,
+    const nextProps = {
       ...otherProps,
       ...this.onEvents,
       [valuekey]: value,
       ref: this.ref,
-    });
+    };
+
+    // 根据 children 类型执行不同的渲染方式, 只支持 fn children 和单 children
+    if (typeof children === 'function') {
+      return children(nextProps);
+    }
+
+    return React.cloneElement(children, nextProps);
   }
 }

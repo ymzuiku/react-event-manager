@@ -190,3 +190,21 @@ const datas = {};
   <input handle="username />
 </Manager>
 ```
+
+## 监听键盘
+
+监听 D 键
+
+```js
+<Manager onEvent={...}>
+  <input event="onKeyD" handle="username />
+</Manager>
+```
+
+监听组合键: ctrl + shift + d:
+
+```js
+<Manager onEvent={...}>
+  <input event="onKeyD_ctrl_shift" handle="username />
+</Manager>
+```
