@@ -40,6 +40,21 @@ export default class extends React.PureComponent {
     this.handleOnEvent({ ...params, isFromDidMount: true });
   };
 
+  getValue = getter => {
+    // eslint-disable-next-line
+    try {
+      return getter(this.formValues);
+    } catch (error) {
+      return void 0;
+    }
+  };
+
+  update = (key, payload) => {
+    if (this.formUpdates[key]) {
+      this.formUpdates[key](payload);
+    }
+  };
+
   handleOnEvent = ({ ref, value, handle, update, eventName, eventArgs, isFromDidMount }) => {
     const { datas, onEvent } = this.props;
 
@@ -50,10 +65,11 @@ export default class extends React.PureComponent {
       ref,
       value,
       handle,
-      values: this.formValues,
       eventArgs,
       refs: this.formRefs,
-      updates: this.formUpdates,
+      values: this.formValues,
+      getValue: this.getValue,
+      update: this.update,
       eventName,
     };
 

@@ -1,5 +1,28 @@
 import React from 'react';
 
+function getCanvasBase64(url, width, height) {
+  return new Promise(res => {
+    const img = new Image(width, height);
+
+    img.src = url;
+    img.onload = () => {
+      // width、height调用时传入具体像素值，控制大小 ,不传则默认图像大小
+      const canvas = document.createElement('canvas');
+
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      const ctx = canvas.getContext('2d');
+
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      const dataURL = canvas.toDataURL('image/png');
+
+      res(dataURL);
+    };
+  });
+}
+
 export default class Event extends React.PureComponent {
   static defaultProps = {
     // 用于配置其他触发onChange的键
@@ -161,11 +184,21 @@ export default class Event extends React.PureComponent {
           v = e.target.files[0];
           const reader = new FileReader();
 
-          reader.readAsBinaryString(v);
-          reader.onloadend = fileData => {
-            updateValue({ result: fileData.target.result, progress: fileData }, true);
+          reader.onloadend = file => {
+            file.fileType = v.type;
+            file.lastModified = v.lastModified;
+            file.name = v.name;
+            file.result = file.target.result;
+            file.url = window.URL.createObjectURL(v);
+            file.width = e.target.width || 100;
+            file.height = e.target.height || 100;
+            getCanvasBase64(file.url, e.target.width || 100, e.target.height || 100).then(base64 => {
+              file.base64 = base64;
+              updateValue(file, true);
+            });
           };
-        } else {
+          reader.readAsBinaryString(v);
+        } else if (e.target.value !== void 0) {
           v = e.target.value;
         }
       }
