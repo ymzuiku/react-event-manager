@@ -54,7 +54,6 @@ import Manager from 'components/react-event-manager';
 | handle      | String               | 触发事件的 handle 名称                                          |
 | value     | Any                  | onEvent 返回的值, 如果是 DOM 对象返回的是 event.target.value   |
 | values    | {[handle]:value, ...}  | 由 handle 名和 value 组合而成的对象                                |
-| getValue    | Function  | 可以安全获取 values 中的某个值                                |
 | ref       | React.element        | 当前触发的 React 对象                                          |
 | refs      | Array<React.element> | 所有被 <Event /> 包裹的 React 对象的集合                       |
 | update   |   (handleName, nextProps)=>void     | 更新某个子组件的函数, 参数会作为 Props 传递给子组件 |
